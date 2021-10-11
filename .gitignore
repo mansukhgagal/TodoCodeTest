@@ -1,5 +1,6 @@
 *.iml
 .gradle
+.idea
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -12,4 +13,11 @@
 /captures
 .externalNativeBuild
 .cxx
+.idea
 local.properties
+
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab

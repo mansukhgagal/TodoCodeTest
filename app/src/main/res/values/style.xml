@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="App.Input.Text" parent="Widget.AppCompat.EditText">
+        <item name="maxLines">1</item>
+        <item name="fontFamily">@font/font_regular</item>
+        <item name="android:textColor">@color/colorOnBackground</item>
+    </style>
+
+    <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="titleTextColor">@color/colorToolbarTitle</item>
+<!--        <item name="android:background">?android:windowBackground</item>-->
+        <item name="navigationIcon">@drawable/ic_back</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+    </style>
+</resources>

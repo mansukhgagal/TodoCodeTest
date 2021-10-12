@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">TodoCodeTest</string>
+
+    <string name="toolbar_title_todo_code">Todo List</string>
+    <string name="toolbar_title_create_todo">Create Todo</string>
+    <string name="toolbar_title_update_todo">Update Todo</string>
+
+    <string name="error_empty_email">Please enter email</string>
+    <string name="error_invalid_email">Invalid email address please check it</string>
+    <string name="error_empty_password">Please enter password</string>
+    <string name="error_invalid_password">Password should be minimum 8 characters</string>
+    <string name="error_something_went_wrong">Something went wrong please try again</string>
+    <string name="error_no_internet">Please check your internet connection!</string>
+
+    <string name="error_enter_title">Please enter title</string>
+    <string name="error_select_time">Please select time</string>
+    <string name="error_select_type">Please select type : Daily or Weekly</string>
+
+    <string name="error_no_todo">There is no Todo added</string>
+    <string name="error_in_adding_todo">Error in adding todo</string>
+
+    <string name="cd_fab">Add todo</string>
+    <string name="cd_more">More options</string>
+
+
+    <string name="label_type">Type</string>
+    <string name="hint_enter_title">Enter title</string>
+    <string name="hint_enter_description">Enter description</string>
+    <string name="hint_select_time">Select time</string>
+    <string name="hint_select_date">Select date</string>
+
+    <string name="type_daily">Daily</string>
+    <string name="type_weekly">Weekly</string>
+
+    <string name="title_select_time">Select a time</string>
+    <string name="title_select_date">Select a date</string>
+
+    <string name="alert_message_delete_todo">Are you sure you want delete this item?</string>
+    <string name="button_yes">Yes</string>
+    <string name="button_no">No</string>
 </resources>

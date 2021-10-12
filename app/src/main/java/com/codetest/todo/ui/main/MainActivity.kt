@@ -38,7 +38,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initControls() {
-        setToolbarTitle(binding.includeToolbar.toolbar,getString(R.string.toolbar_title_todo_code))
+        setToolbarTitle(binding.includeToolbar.toolbar, getString(R.string.toolbar_title_todo_code))
 
         binding.recyclerView.addItemDecoration(
             EqualSpacingItemDecoration(
@@ -46,7 +46,7 @@ class MainActivity : BaseActivity() {
                 EqualSpacingItemDecoration.VERTICAL
             )
         )
-        todoAdapter = TodoAdapter(this)
+        todoAdapter = TodoAdapter(this, todoList)
         binding.recyclerView.adapter = todoAdapter
 
         viewModel.getAllTodoList(0)
@@ -68,8 +68,10 @@ class MainActivity : BaseActivity() {
                     if (list.isNullOrEmpty()) {
                         showError(getString(R.string.error_no_todo))
                     } else {
+                        val startIndex = todoList.size
+                        val itemCount = list.size
                         todoList.addAll(list)
-                        todoAdapter?.submitList(todoList)
+                        todoAdapter?.notifyItemRangeInserted(startIndex, itemCount)
                     }
                 }
                 is Resource.Error -> {
@@ -102,9 +104,8 @@ class MainActivity : BaseActivity() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val todoData: TodoModel? = result.data?.getParcelableExtra(KEY_DATA)
                 todoData?.let {
-                    todoList.add(0,it)
-                    todoAdapter?.submitList(todoList)
-//                    todoAdapter?.notifyItemInserted(0)
+                    todoList.add(0, it)
+                    todoAdapter?.notifyItemInserted(0)
                 }
             }
         }

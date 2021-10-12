@@ -1,13 +1,10 @@
 package com.codetest.todo.ui.main
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.codetest.todo.R
 import com.codetest.todo.databinding.ItemTodoBinding
@@ -19,7 +16,7 @@ import com.codetest.todo.utils.invisible
 import com.codetest.todo.utils.show
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class TodoAdapter(val context: Context) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
+class TodoAdapter(val context: Context,val todoList:MutableList<TodoModel>) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
     inner class TodoViewHolder(private val binding: ItemTodoBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {
@@ -61,7 +58,7 @@ class TodoAdapter(val context: Context) : RecyclerView.Adapter<TodoAdapter.TodoV
         private fun alertDelete() {
             val alertBuilder = MaterialAlertDialogBuilder(context)
                 .setPositiveButton(context.getString(R.string.button_yes)) { dialog, _ ->
-                    differ.currentList.removeAt(adapterPosition)
+                    todoList.removeAt(adapterPosition)
                     notifyItemRemoved(adapterPosition)
                     dialog.dismiss()
                 }
@@ -74,7 +71,7 @@ class TodoAdapter(val context: Context) : RecyclerView.Adapter<TodoAdapter.TodoV
         }
     }
 
-    val diffCallback = object : DiffUtil.ItemCallback<TodoModel>() {
+    /*val diffCallback = object : DiffUtil.ItemCallback<TodoModel>() {
         override fun areItemsTheSame(oldItem: TodoModel, newItem: TodoModel): Boolean {
             return oldItem.id == newItem.id
         }
@@ -86,7 +83,8 @@ class TodoAdapter(val context: Context) : RecyclerView.Adapter<TodoAdapter.TodoV
 
     val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitList(list: List<TodoModel>) = differ.submitList(list)
+    fun submitList(list: List<TodoModel>) = differ.submitList(list)*/
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         return TodoViewHolder(
@@ -99,18 +97,18 @@ class TodoAdapter(val context: Context) : RecyclerView.Adapter<TodoAdapter.TodoV
     }
 
     override fun getItemCount(): Int {
-        return differ.currentList.size
+        return todoList.size
     }
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
-        val todo = differ.currentList[position]
+        val todo = todoList[position]
         holder.bindData(todo)
     }
 
     fun getItem(position: Int): TodoModel? {
         if (position == RecyclerView.NO_POSITION) return null
         return try {
-            differ.currentList[position]
+            todoList[position]
         } catch (ex: IndexOutOfBoundsException) {
             null
         }

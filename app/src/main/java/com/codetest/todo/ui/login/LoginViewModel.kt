@@ -13,22 +13,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private typealias API_RES = Resource<ApiResponse>
+private typealias API_RESULT = Resource<ApiResponse>
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val repository: LoginRepository,application: Application) : AndroidViewModel(application) {
 
-    private val _mutableLiveDataLogin = MutableLiveData<API_RES>()
-    val liveDataLogin: LiveData<API_RES>
+    private val _mutableLiveDataLogin = MutableLiveData<API_RESULT>()
+    val liveDataLogin: LiveData<API_RESULT>
         get() = _mutableLiveDataLogin
 
-    val baseApp = getApplication<BaseApplication>()
+    private val baseApp = getApplication<BaseApplication>()
 
     fun doLogin(userData: UserData) {
         _mutableLiveDataLogin.postValue(Resource.Loading(null))
         viewModelScope.launch {
             if(BuildConfig.DEBUG) //for debug only
-                delay(3000)
+                delay(100)
             try {
                 val response = repository.doLogin(userData)
                 _mutableLiveDataLogin.postValue(Resource.Success(response))

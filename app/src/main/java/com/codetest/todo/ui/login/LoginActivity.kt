@@ -1,12 +1,9 @@
 package com.codetest.todo.ui.login
 
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.codetest.todo.BuildConfig
 import com.codetest.todo.R
 import com.codetest.todo.databinding.ActivityLoginBinding
@@ -35,9 +32,8 @@ class LoginActivity : AppCompatActivity() {
             doLogin()
         }
         if(BuildConfig.DEBUG) { //for debug only
-            binding.etEmail.setText("eve.holt@reqres.in")
-            binding.etPassword.setText("123456")
-
+            binding.etEmail.setText(getString(R.string.test_email))
+            binding.etPassword.setText(getString(R.string.test_password))
         }
         subscribeUI()
     }
@@ -46,8 +42,8 @@ class LoginActivity : AppCompatActivity() {
     private fun getPassword(): String = binding.etPassword.text.toString()
 
     private fun doLogin() {
-        val email = binding.etEmail.text.toString()
-        val password = binding.etPassword.text.toString()
+        val email = getEmail()
+        val password = getPassword()
         binding.tilEmail.error = null
         binding.tilPassword.error = null
         if (UserData.isEmailEmpty(email)) {
@@ -70,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun subscribeUI() {
-        viewModel.liveDataLogin.observe(this, Observer {
+        viewModel.liveDataLogin.observe(this, {
             when (it) {
                 is Resource.Loading -> {
                     updateUIState(false)

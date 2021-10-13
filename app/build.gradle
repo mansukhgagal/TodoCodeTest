@@ -7,6 +7,16 @@ plugins {
 }
 
 android {
+    signingConfigs {
+
+        debug {
+            storeFile file('C:\\Users\\USERNAME\\.android\\debug.keystore')
+            keyAlias 'androiddebugkey'
+            storePassword 'android'
+            keyPassword 'android'
+        }
+    }
+
     compileSdk 31
 
     defaultConfig {
@@ -14,9 +24,10 @@ android {
         minSdk 21
         targetSdk 31
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
@@ -93,8 +104,6 @@ dependencies {
     implementation("androidx.security:security-crypto:$security_crypto_version")
     // For App Authentication APIs
     implementation("androidx.security:security-app-authenticator:$security_authenticator_version")
-
-    implementation "org.greenrobot:eventbus:$event_bus_version"
 
     // Timber
     implementation "com.jakewharton.timber:timber:$timber_version"

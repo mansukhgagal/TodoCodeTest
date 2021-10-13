@@ -50,4 +50,6 @@
     
     <string name="dummy_title">Republic of India</string>
     <string name="dummy_desc">India, officially the Republic of India, is a country in South Asia. It is the seventh-largest country by area, the second-most populous country, and the most populous democracy in the world.</string>
+    <string name="test_email">eve.holt@reqres.in</string>
+    <string name="test_password">123456</string>
 </resources>

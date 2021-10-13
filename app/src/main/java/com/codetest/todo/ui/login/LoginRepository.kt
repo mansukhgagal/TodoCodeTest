@@ -7,7 +7,7 @@ import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 @ActivityScoped
-class LoginRepository @Inject constructor(val api: WebServices) {
+class LoginRepository @Inject constructor(private val api: WebServices) {
 
     @Throws(Exception::class)
     suspend fun doLogin(userData:UserData): ApiResponse {

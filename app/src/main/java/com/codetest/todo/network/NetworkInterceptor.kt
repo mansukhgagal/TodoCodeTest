@@ -38,7 +38,7 @@ class NetworkInterceptor : Interceptor {
     }
 
     private fun addAuthHeader(builder: Request.Builder, header: String) {
-        builder.addHeader("xsafetyNetAttestatioKey", header)
+        builder.addHeader("authToken", header)
     }
 
     private fun regenerateToken(): Int {

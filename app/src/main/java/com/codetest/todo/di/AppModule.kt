@@ -2,8 +2,6 @@ package com.codetest.todo.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.codetest.todo.BuildConfig
 import com.codetest.todo.db.TodoDAO
 import com.codetest.todo.db.TodoDatabase
@@ -12,7 +10,6 @@ import com.codetest.todo.network.WebServices
 import com.codetest.todo.ui.create.TodoRepository
 import com.codetest.todo.ui.login.LoginRepository
 import com.codetest.todo.utils.Constants.TODO_DATABASE_NAME
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,26 +27,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private var BASE_URL = "https://reqres.in/api/"
-    private const val CONNECT_TIMEOUT = 30L
-    private const val READ_TIMEOUT = 30L
-    private const val WRITE_TIMEOUT = 30L
-
-    @Provides
-    @Singleton
-    fun provideCache(@ApplicationContext context: Context): Cache {
-        val cacheSize = (5 * 1024 * 1024).toLong()
-        return Cache(context.cacheDir, cacheSize)
-    }
-
     @Provides
     @Singleton
     fun provideApi(cache: Cache): WebServices {
+        val baseUrl = "https://reqres.in/api/"
+        val connectionTimeout = 30L
+        val readTimeout = 30L
+        val writeTimeout = 30L
+
         val client = OkHttpClient.Builder()
             .cache(cache)
-            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-            .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-            .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
+            .connectTimeout(connectionTimeout, TimeUnit.SECONDS)
+            .readTimeout(readTimeout, TimeUnit.SECONDS)
+            .writeTimeout(writeTimeout, TimeUnit.SECONDS)
             .addNetworkInterceptor(NetworkInterceptor())
 
         if (BuildConfig.DEBUG) {
@@ -60,9 +50,16 @@ object AppModule {
 
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .client(client.build())
             .build().create(WebServices::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCache(@ApplicationContext context: Context): Cache {
+        val cacheSize = (5 * 1024 * 1024).toLong()
+        return Cache(context.cacheDir, cacheSize)
     }
 
     @Provides
@@ -83,10 +80,12 @@ object AppModule {
         TodoDatabase::class.java,
         TODO_DATABASE_NAME
     )
-        .addMigrations(TodoDatabase.MIGRATION_1_2)
+//        .createFromAsset("database/todo_db.db")//only for debug
+        .addMigrations(TodoDatabase.MIGRATION_1_2) //small migration sample
         .build()
 
     @Singleton
     @Provides
     fun provideTodoDao(db: TodoDatabase) = db.getTodoDao()
+
 }

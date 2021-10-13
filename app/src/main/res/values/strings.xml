@@ -20,6 +20,7 @@
     <string name="error_no_todo">There is no Todo added</string>
     <string name="error_in_adding_todo">Error in adding todo</string>
     <string name="success_todo_created">Todo created successfully.</string>
+    <string name="success_todo_updated">Todo updated successfully.</string>
 
     <string name="cd_fab">Add todo</string>
     <string name="cd_more">More options</string>

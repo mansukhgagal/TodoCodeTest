@@ -5,11 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.codetest.todo.R
 import com.codetest.todo.app.BaseActivity
 import com.codetest.todo.databinding.ActivityCreateTodoBinding
 import com.codetest.todo.network.Resource
+import com.codetest.todo.service.AlarmWork
 import com.codetest.todo.utils.Constants
 import com.codetest.todo.utils.Constants.TYPE_DAILY
 import com.codetest.todo.utils.Constants.TYPE_UNKNOWN
@@ -22,6 +26,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import java.util.*
 
 @AndroidEntryPoint
 class CreateTodoActivity : BaseActivity(), View.OnClickListener {
@@ -30,6 +35,7 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
     private var selectedTime: String? = null
     private var selectedDate: Long? = null
     private var updateItemId: Int? = null
+    private var todoData: TodoModel? = null
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -47,14 +53,17 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
 
     private fun handleIntent() {
         intent?.let { _intent ->
-            val todoData: TodoModel? = _intent.getParcelableExtra(Constants.KEY_DATA)
+            todoData = _intent.getParcelableExtra(Constants.KEY_DATA)
+            Timber.d("hash ${todoData.hashCode()}")
             todoData?.apply {
                 updateItemId = id
                 binding.etTitle.setText(title)
                 binding.etDescription.setText(description)
                 binding.etTime.setText(time)
                 binding.etDate.setText(Utility.getFormattedDate(date))
-                when(type) {
+                selectedTime = time
+                selectedDate = date
+                when (type) {
                     TYPE_DAILY -> binding.rbDaily.isChecked = true
                     TYPE_WEEKLY -> binding.rbWeekly.isChecked = true
                 }
@@ -77,14 +86,20 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun subscribeUI() {
-        viewModel.liveDataInsert.observe(this, Observer {
+        viewModel.liveDataInsert.observe(this, {
             when (it) {
                 is Resource.Loading -> {
                 }
                 is Resource.Success -> {
                     val resultIntent = Intent()
+                    resultIntent.putExtra(Constants.KEY_IS_UPDATE, updateItemId != null)
                     resultIntent.putExtra(Constants.KEY_DATA, it.data)
+                    Timber.d("hash ${it.data?.hashCode()}")
                     setResult(Activity.RESULT_OK, resultIntent)
+
+                    //set alarm request
+                   scheduleAlarmForTodo(it.data)
+
                     finish()
                 }
                 is Resource.Error -> {
@@ -101,9 +116,21 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
 
     private fun getTodoTitle(): String = binding.etTitle.text.toString()
     private fun getTodoDescription(): String = binding.etDescription.text.toString()
-    private fun getTodoTime(): String = binding.etTitle.text.toString()
-    private fun getTodoDate(): String = binding.etDate.text.toString()
     private fun getTodoType(): Int = binding.radioLayout.checkedRadioButtonId
+
+    private fun scheduleAlarmForTodo(data:TodoModel?) {
+        data?.apply {
+            val dataBuilder = Data.Builder()
+            id?.let { _id -> dataBuilder.putInt(Constants.KEY_ALARM_ID, _id) }
+            date?.let { _date -> dataBuilder.putLong(Constants.KEY_DATE, _date) }
+            dataBuilder.putString(Constants.KEY_TIME, time)
+            dataBuilder.putInt(Constants.KEY_TYPE, type!!)
+            val alarmWork: WorkRequest = OneTimeWorkRequestBuilder<AlarmWork>()
+                .setInputData(dataBuilder.build())
+                .build()
+            WorkManager.getInstance(this@CreateTodoActivity).enqueue((alarmWork))
+        }
+    }
 
     private fun createTodo() {
         val title = getTodoTitle()
@@ -124,7 +151,7 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
             binding.etTitle.requestFocus()
         } else if (TodoModel.invalidTime(selectedTime)) {
             binding.tilTime.error = getString(R.string.error_select_time)
-        } else if(TodoModel.invalidDate(selectedDate)) {
+        } else if (TodoModel.invalidDate(selectedDate)) {
             binding.tilDate.error = getString(R.string.error_select_date)
         } else if (TodoModel.invalidType(type)) {
             SnackBarHelper.infoSnackBar(
@@ -135,12 +162,19 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
             )
         } else {
             hideKeyboard()
-            val data =
-                TodoModel(updateItemId, title, description, selectedTime!!, selectedDate, type)
-            updateItemId?.let {
-                viewModel.updateTodo(data)
-            } ?: kotlin.run {
-                viewModel.insertTodo(data)
+            if (updateItemId == null) {
+                todoData =
+                    TodoModel(updateItemId, title, description, selectedTime!!, selectedDate, type)
+                viewModel.insertTodo(todoData!!)
+            } else {
+                todoData?.apply {
+                    this.title = title
+                    this.description = description
+                    time = selectedTime!!
+                    date = selectedDate
+                    this.type = type
+                }
+                viewModel.updateTodo(todoData!!)
             }
         }
     }
@@ -162,12 +196,23 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun openTimePicker() {
+
         val picker =
-            MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(12)
-                .setMinute(10)
-                .setTitleText(getString(R.string.title_select_time))
+            MaterialTimePicker.Builder().apply {
+                setTimeFormat(TimeFormat.CLOCK_12H)
+                if (updateItemId == null) {
+                    val calender = Calendar.getInstance()
+                    calender.timeInMillis = System.currentTimeMillis()
+                    setHour(calender.get(Calendar.HOUR_OF_DAY))
+                    setMinute(calender.get(Calendar.MINUTE))
+                } else {
+                    Utility.getHoursAndMinute(todoData?.time)?.let {
+                        setHour(it.first)
+                        setMinute(it.second)
+                    }
+                }
+                setTitleText(getString(R.string.title_select_time))
+            }
                 .build()
         picker.show(supportFragmentManager, "timePicker")
 
@@ -178,43 +223,27 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
             Timber.d("hour ${hour}:${minute}")
             selectedTime = "${hour}:${minute}"
             binding.etTime.setText(Utility.getFormattedTime(hour, minute))
-            // call back code
-        }
-        picker.addOnNegativeButtonClickListener {
-            // call back code
-        }
-        picker.addOnCancelListener {
-            // call back code
-        }
-        picker.addOnDismissListener {
-            // call back code
         }
     }
 
     private fun openDatePicker() {
         val picker =
-            MaterialDatePicker.Builder.datePicker()
-                .setTitleText(getString(R.string.title_select_date))
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            MaterialDatePicker.Builder.datePicker().apply {
+                setTitleText(getString(R.string.title_select_date))
+                todoData?.date?.let {
+                    setSelection(it)
+                } ?: kotlin.run {
+                    setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                }
+            }
                 .build()
         picker.show(supportFragmentManager, "datePicker")
 
-
         picker.addOnPositiveButtonClickListener {
             Timber.d("headerText ${picker.headerText}")
-            Timber.d("headerText ${it}")
+            Timber.d("headerText $it")
             selectedDate = it
             binding.etDate.setText(Utility.getFormattedDate(it))
-            // call back code
-        }
-        picker.addOnNegativeButtonClickListener {
-            // call back code
-        }
-        picker.addOnCancelListener {
-            // call back code
-        }
-        picker.addOnDismissListener {
-            // call back code
         }
     }
 }

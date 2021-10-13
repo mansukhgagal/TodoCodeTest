@@ -2,12 +2,9 @@ package com.codetest.todo.ui.main
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.app.ActivityOptionsCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codetest.todo.R
@@ -19,8 +16,10 @@ import com.codetest.todo.ui.create.TodoModel
 import com.codetest.todo.ui.create.TodoViewModel
 import com.codetest.todo.utils.*
 import com.codetest.todo.utils.Constants.KEY_DATA
+import com.codetest.todo.utils.Constants.KEY_IS_UPDATE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -72,7 +71,7 @@ class MainActivity : BaseActivity() {
         subscribeUI()
         fetchSavedTodo()
         binding.fabAdd.setOnClickListener {
-            createTodo()
+            createOrUpdateTodo(null)
         }
     }
 
@@ -81,7 +80,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun subscribeUI() {
-        viewModel.liveDataTodoList.observe(this, Observer {
+        viewModel.liveDataTodoList.observe(this, {
             when (it) {
                 is Resource.Loading -> {
                     hideError()
@@ -117,30 +116,48 @@ class MainActivity : BaseActivity() {
         binding.textErrorMessage.hide()
     }
 
-    private fun createTodo() {
-        val intent = Intent(this, CreateTodoActivity::class.java)
-        resultLauncher.launch(intent)
+    fun createOrUpdateTodo(todo: TodoModel?) {
+        Timber.d("hash ${todo?.hashCode()}")
+        val detailIntent = Intent(this, CreateTodoActivity::class.java)
+        todo?.let { detailIntent.putExtra(KEY_DATA, it) }
+        resultLauncher.launch(detailIntent)
     }
 
-    val resultLauncher =
+    private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val todoData: TodoModel? = result.data?.getParcelableExtra(KEY_DATA)
+                val isUpdate: Boolean = result.data!!.getBooleanExtra(KEY_IS_UPDATE, false)
                 todoData?.let {
                     binding.recyclerView.postDelayed({
-                        if(isAlive()) {
-                            hideError()
-                            todoList.add(0, it)
-                            todoAdapter?.notifyItemInserted(0)
-                            binding.recyclerView.smoothScrollToPosition(0)
+                        if (isAlive()) {
+                            val message: String
+                            if (isUpdate) {
+//                                val updatedIndex = todoList.indexOf(it)
+                                for (item in todoList) {
+                                    if(it.id == item.id) {
+                                        val updatedIndex = todoList.indexOf(item)
+                                        todoList[updatedIndex] = it
+                                        todoAdapter?.notifyItemChanged(updatedIndex)
+                                        break
+                                    }
+                                }
+                                message = getString(R.string.success_todo_updated)
+                            } else {
+                                hideError()
+                                todoList.add(0, it)
+                                todoAdapter?.notifyItemInserted(0)
+                                binding.recyclerView.smoothScrollToPosition(0)
+                                message = getString(R.string.success_todo_created)
+                            }
                             SnackBarHelper.infoSnackBar(
                                 binding.root,
-                                getString(R.string.success_todo_created),
+                                message,
                                 null,
                                 null
                             )
                         }
-                    },500)
+                    }, 500)
                 }
             }
         }

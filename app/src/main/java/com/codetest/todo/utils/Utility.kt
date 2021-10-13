@@ -50,6 +50,23 @@ object Utility {
         return DateFormat.format("dd/MM/yyyy", calendar).toString()
     }
 
+    fun getHoursAndMinute(input:String?) :Pair<Int,Int>? {
+        input ?: return null
+        val inputFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        try {
+            val date: Date? = inputFormat.parse(input)
+            date ?: return null
+            val calendar = Calendar.getInstance(Locale.ENGLISH)
+            calendar.timeInMillis = date.time
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+            return Pair(hour,minute)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
     fun getDisplayFormattedTime(input:String) :String {
         val inputFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
         try {

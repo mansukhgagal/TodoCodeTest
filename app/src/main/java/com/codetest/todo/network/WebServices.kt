@@ -1,6 +1,5 @@
 package com.codetest.todo.network
 
-import com.codetest.todo.data.ApiResponse
 import com.codetest.todo.ui.login.UserData
 import retrofit2.Response
 import retrofit2.http.Body

@@ -60,8 +60,10 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository,
         viewModelScope.launch {
             try {
                 repository.updateTodo(data)
+                _mutableLiveDataInsert.postValue(Resource.Success(data))
             } catch (e: Exception) {
                 e.printStackTrace()
+                _mutableLiveDataInsert.postValue(Resource.Error(e.message ?: baseApp.getString(R.string.error_something_went_wrong) ))
             }
         }
     }

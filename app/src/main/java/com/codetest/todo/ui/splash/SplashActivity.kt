@@ -1,17 +1,17 @@
 package com.codetest.todo.ui.splash
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
+import com.codetest.todo.app.BaseActivity
 import com.codetest.todo.ui.login.LoginActivity
 import com.codetest.todo.ui.main.MainActivity
 import com.codetest.todo.utils.SecurePreference
 
-class SplashActivity : AppCompatActivity() {
+@SuppressLint("CustomSplashScreen")
+class SplashActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         if (SecurePreference.isLogin()) {
             val mainIntent = Intent(this, MainActivity::class.java)
             startActivity(mainIntent)

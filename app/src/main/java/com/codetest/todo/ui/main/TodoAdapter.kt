@@ -1,22 +1,19 @@
 package com.codetest.todo.ui.main
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.codetest.todo.R
 import com.codetest.todo.databinding.ItemTodoBinding
-import com.codetest.todo.ui.create.CreateTodoActivity
 import com.codetest.todo.ui.create.TodoModel
 import com.codetest.todo.utils.Constants
 import com.codetest.todo.utils.Utility
 import com.codetest.todo.utils.invisible
 import com.codetest.todo.utils.show
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class TodoAdapter(val context: Context,val todoList:MutableList<TodoModel>) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
+class TodoAdapter(val context: Context,private val todoList:MutableList<TodoModel>) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
     inner class TodoViewHolder(private val binding: ItemTodoBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {
@@ -38,8 +35,8 @@ class TodoAdapter(val context: Context,val todoList:MutableList<TodoModel>) : Re
 
                 textType.show()
                 when(data.type) {
-                    Constants.TYPE_DAILY->textType.setText(context.getString(R.string.type_daily))
-                    Constants.TYPE_WEEKLY->textType.setText(context.getString(R.string.type_weekly))
+                    Constants.TYPE_DAILY-> textType.text = context.getString(R.string.type_daily)
+                    Constants.TYPE_WEEKLY-> textType.text = context.getString(R.string.type_weekly)
                     else -> textType.invisible()
                 }
 
@@ -52,9 +49,7 @@ class TodoAdapter(val context: Context,val todoList:MutableList<TodoModel>) : Re
             val data = getItem(adapterPosition)
             when(view?.id) {
                 R.id.card->{
-                    val detailIntent = Intent(context, CreateTodoActivity::class.java)
-                    detailIntent.putExtra(Constants.KEY_DATA, data)
-                    context.startActivity(detailIntent)
+                    (context as? MainActivity)?.createOrUpdateTodo(data)
                 }
                 R.id.ib_more->{
                     (context as? MainActivity)?.alertDelete(data)

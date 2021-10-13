@@ -17,4 +17,5 @@
     <color name="color_white">#FFFFFFFF</color>
 
     <color name="color_list_card">#455A64</color>
+    <color name="color_highlight">#F37C11</color>
 </resources>

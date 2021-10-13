@@ -8,6 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.codetest.todo.R
 import com.codetest.todo.app.BaseActivity
 import com.codetest.todo.databinding.ActivityMainBinding
@@ -15,11 +17,9 @@ import com.codetest.todo.network.Resource
 import com.codetest.todo.ui.create.CreateTodoActivity
 import com.codetest.todo.ui.create.TodoModel
 import com.codetest.todo.ui.create.TodoViewModel
+import com.codetest.todo.utils.*
 import com.codetest.todo.utils.Constants.KEY_DATA
-import com.codetest.todo.utils.EqualSpacingItemDecoration
-import com.codetest.todo.utils.convertDpToPixel
-import com.codetest.todo.utils.hide
-import com.codetest.todo.utils.show
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,6 +39,7 @@ class MainActivity : BaseActivity() {
 
     private fun initControls() {
         setToolbarTitle(binding.includeToolbar.toolbar, getString(R.string.toolbar_title_todo_code))
+        binding.includeToolbar.toolbar.setNavigationOnClickListener(null)
 
         binding.recyclerView.addItemDecoration(
             EqualSpacingItemDecoration(
@@ -49,12 +50,34 @@ class MainActivity : BaseActivity() {
         todoAdapter = TodoAdapter(this, todoList)
         binding.recyclerView.adapter = todoAdapter
 
-        viewModel.getAllTodoList(0)
-        subscribeUI()
+        val scrollListener = object :
+            EndlessRecyclerViewScrollListener(binding.recyclerView.layoutManager as LinearLayoutManager) {
+            override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(view, dx, dy)
+                if (dy > 0) {
+                    binding.fabAdd.hide()
+                } else {
+                    binding.fabAdd.show()
+                }
+            }
 
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                fetchSavedTodo(totalItemsCount)
+            }
+        }
+
+        binding.recyclerView.addOnScrollListener(scrollListener)
+
+
+        subscribeUI()
+        fetchSavedTodo()
         binding.fabAdd.setOnClickListener {
             createTodo()
         }
+    }
+
+    private fun fetchSavedTodo(offset: Int = 0) {
+        viewModel.getAllTodoList(offset)
     }
 
     private fun subscribeUI() {
@@ -65,12 +88,12 @@ class MainActivity : BaseActivity() {
                 }
                 is Resource.Success -> {
                     val list = it.data
-                    if (list.isNullOrEmpty()) {
+                    val startIndex = todoList.size
+                    val itemCount = list?.size ?: 0
+                    if (list.isNullOrEmpty() && startIndex == 0) {
                         showError(getString(R.string.error_no_todo))
                     } else {
-                        val startIndex = todoList.size
-                        val itemCount = list.size
-                        todoList.addAll(list)
+                        todoList.addAll(list!!)
                         todoAdapter?.notifyItemRangeInserted(startIndex, itemCount)
                     }
                 }
@@ -104,10 +127,42 @@ class MainActivity : BaseActivity() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val todoData: TodoModel? = result.data?.getParcelableExtra(KEY_DATA)
                 todoData?.let {
-                    todoList.add(0, it)
-                    todoAdapter?.notifyItemInserted(0)
+                    binding.recyclerView.postDelayed({
+                        if(isAlive()) {
+                            hideError()
+                            todoList.add(0, it)
+                            todoAdapter?.notifyItemInserted(0)
+                            binding.recyclerView.smoothScrollToPosition(0)
+                            SnackBarHelper.infoSnackBar(
+                                binding.root,
+                                getString(R.string.success_todo_created),
+                                null,
+                                null
+                            )
+                        }
+                    },500)
                 }
             }
         }
 
+    internal fun alertDelete(todo: TodoModel?) {
+        todo ?: return
+        val alertBuilder = MaterialAlertDialogBuilder(this)
+            .setPositiveButton(getString(R.string.button_yes)) { dialog, _ ->
+                val position = todoList.indexOf(todo)
+                todoList.removeAt(position)
+                todoAdapter?.notifyItemRemoved(position)
+                viewModel.deleteTodo(todo)
+                if (todoList.isEmpty()) {
+                    showError(getString(R.string.error_no_todo))
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.button_no)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setMessage(getString(R.string.alert_message_delete_todo))
+        alertBuilder.create().show()
+
+    }
 }

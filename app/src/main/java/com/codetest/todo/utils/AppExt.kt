@@ -7,7 +7,9 @@ import android.content.pm.PackageManager
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.lifecycle.Lifecycle
 import kotlin.math.roundToInt
 
 fun View.show() {
@@ -31,3 +33,5 @@ fun Context.convertDpToPixel(dp: Float): Int {
     return (dp * (resources
         .displayMetrics.densityDpi  / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
 }
+
+fun AppCompatActivity.isAlive() : Boolean = lifecycle.currentState != Lifecycle.State.DESTROYED

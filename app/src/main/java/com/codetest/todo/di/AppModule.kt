@@ -2,6 +2,8 @@ package com.codetest.todo.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.codetest.todo.BuildConfig
 import com.codetest.todo.db.TodoDAO
 import com.codetest.todo.db.TodoDatabase
@@ -35,14 +37,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCache(@ApplicationContext context:Context) : Cache {
+    fun provideCache(@ApplicationContext context: Context): Cache {
         val cacheSize = (5 * 1024 * 1024).toLong()
         return Cache(context.cacheDir, cacheSize)
     }
 
     @Provides
     @Singleton
-    fun provideApi(cache: Cache) : WebServices {
+    fun provideApi(cache: Cache): WebServices {
         val client = OkHttpClient.Builder()
             .cache(cache)
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
@@ -65,11 +67,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideLoginRepository(api:WebServices) : LoginRepository = LoginRepository(api)
+    fun provideLoginRepository(api: WebServices): LoginRepository = LoginRepository(api)
 
     @Provides
     @Singleton
-    fun provideTodoRepository(dao:TodoDAO) : TodoRepository = TodoRepository(dao)
+    fun provideTodoRepository(dao: TodoDAO): TodoRepository = TodoRepository(dao)
 
 
     @Singleton
@@ -80,7 +82,9 @@ object AppModule {
         app,
         TodoDatabase::class.java,
         TODO_DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(TodoDatabase.MIGRATION_1_2)
+        .build()
 
     @Singleton
     @Provides

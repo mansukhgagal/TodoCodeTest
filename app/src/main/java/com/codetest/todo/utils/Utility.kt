@@ -6,6 +6,8 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.text.format.DateFormat
 import com.codetest.todo.app.BaseApplication
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.*
 
 object Utility {
@@ -46,6 +48,20 @@ object Utility {
         calendar.timeInMillis = timestamp
 
         return DateFormat.format("dd/MM/yyyy", calendar).toString()
+    }
+
+    fun getDisplayFormattedTime(input:String) :String {
+        val inputFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        try {
+            val date: Date? = inputFormat.parse(input)
+            date ?: return ""
+            val calendar = Calendar.getInstance(Locale.ENGLISH)
+            calendar.timeInMillis = date.time
+            return DateFormat.format("hh:mm aa", calendar).toString()
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        return ""
     }
 
     fun getFormattedTime(hour:Int,minute:Int) :String {

@@ -10,25 +10,41 @@
         android:id="@+id/text_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
+        android:visibility="visible"
+        android:maxLines="1"
+        app:fontFamily="@font/font_bold"
+        android:textColor="@color/color_black"
+        app:layout_constraintEnd_toEndOf="@+id/text_type"
+        app:layout_constraintStart_toStartOf="@+id/text_type"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="11:11" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/selector_type_end"
+        android:maxLines="1"
         android:visibility="visible"
         app:fontFamily="@font/font_bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="11:11" />
+        app:layout_constraintTop_toBottomOf="@+id/text_time"
+        tools:text="Daily" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="#F13434"
-        app:cardUseCompatPadding="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="4dp"
+        app:cardBackgroundColor="@color/color_list_card"
         app:cardCornerRadius="8dp"
+        app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_time"
+        app:layout_constraintStart_toEndOf="@+id/vertical_barrier"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,6 +59,9 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
+                android:maxLines="1"
+                android:textColor="@color/color_white"
+                android:textStyle="italic"
                 android:visibility="visible"
                 app:fontFamily="@font/font_bold"
                 app:layout_constraintEnd_toStartOf="@+id/ib_more"
@@ -57,7 +76,9 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:textColor="@color/colorWhite"
+                android:maxLines="4"
+                android:textColor="@color/color_white"
+                android:textSize="@dimen/text_size_list_title"
                 android:visibility="visible"
                 app:fontFamily="@font/font_bold"
                 app:layout_constraintEnd_toStartOf="@+id/ib_more"
@@ -72,7 +93,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="8dp"
                 android:gravity="start"
-                android:textColor="@color/colorWhite"
+                android:maxLines="8"
+                android:textColor="@color/color_white"
                 android:visibility="visible"
                 app:fontFamily="@font/font_regular"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -88,13 +110,26 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_more"
                 android:contentDescription="@string/cd_more"
+                android:src="@drawable/ic_more"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/colorWhite" />
+                app:tint="@color/color_white" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="left" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/vertical_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="text_time,text_type"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

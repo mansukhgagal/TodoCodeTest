@@ -11,6 +11,9 @@ interface TodoDAO {
     @Update
     suspend fun updateTodo(todo:TodoModel)
 
+    @Delete
+    suspend fun deleteTodo(todo:TodoModel)
+
     @Query("SELECT * FROM todo ORDER BY date DESC LIMIT 50 OFFSET :offset")
     suspend fun getAllTodoList(offset:Int=0) : List<TodoModel>
 }

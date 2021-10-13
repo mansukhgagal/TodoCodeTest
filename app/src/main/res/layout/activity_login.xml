@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ui.login.LoginActivity">
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:trackThickness="4dp"
+        android:visibility="gone"
+        android:indeterminate="true"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/text_login_title"
@@ -15,9 +26,9 @@
         android:layout_gravity="center"
         android:layout_marginTop="24dp"
         android:padding="0dp"
-        android:text="Welcomes to,"
+        android:text="@string/login_title"
         android:textColor="@color/color_on_secondary"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_login_welcome"
         android:visibility="visible"
         app:fontFamily="@font/font_bold"
         app:layout_constraintStart_toStartOf="@+id/text_login_sub_title"
@@ -33,14 +44,13 @@
         android:letterSpacing="0.2"
         android:padding="0dp"
         android:text="@string/app_name"
-        android:textColor="@color/colorBlack"
-        android:textSize="28sp"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/text_size_login_title"
         android:visibility="visible"
         app:fontFamily="@font/font_bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_login_title"
         tools:text="Todo Code Test" />
-
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_email"
@@ -49,7 +59,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:hint="Enter email"
+        android:hint="@string/hint_enter_email"
         app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,25 +73,22 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/font_medium"
             android:inputType="text"
-            android:text="eve.holt@reqres.in"
+            tools:text="eve.holt@reqres.in"
             android:textColor="@android:color/black" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Enter password"
-        app:counterEnabled="true"
-        app:counterMaxLength="10"
-        app:endIconMode="clear_text"
+        android:hint="@string/hint_enter_password"
         app:layout_constraintEnd_toEndOf="@+id/til_email"
         app:layout_constraintStart_toStartOf="@+id/til_email"
         app:layout_constraintTop_toBottomOf="@+id/til_email"
         app:startIconDrawable="@drawable/ic_password"
+        app:passwordToggleEnabled="true"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -90,11 +97,9 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/font_medium"
             android:inputType="textPassword"
-            android:maxLength="10"
             android:textColor="@android:color/black" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_login"
@@ -107,13 +112,12 @@
         android:fontFamily="@font/font_bold"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="REGISTER"
+        android:text="@string/button_login"
         android:textColor="@color/color_primary"
         app:cornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_password"
         app:strokeWidth="1dp" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,8 +27,9 @@ import timber.log.Timber
 class CreateTodoActivity : BaseActivity(), View.OnClickListener {
     private lateinit var binding: ActivityCreateTodoBinding
     private val viewModel: TodoViewModel by viewModels()
-    private var selectedTime:String?=null
-    private var selectedDate:Long?=null
+    private var selectedTime: String? = null
+    private var selectedDate: Long? = null
+    private var updateItemId: Int? = null
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -40,25 +41,35 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateTodoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initControls()
         handleIntent()
+        initControls()
     }
 
     private fun handleIntent() {
-        intent?.let { _intent->
+        intent?.let { _intent ->
             val todoData: TodoModel? = _intent.getParcelableExtra(Constants.KEY_DATA)
             todoData?.apply {
+                updateItemId = id
                 binding.etTitle.setText(title)
                 binding.etDescription.setText(description)
                 binding.etTime.setText(time)
                 binding.etDate.setText(Utility.getFormattedDate(date))
+                when(type) {
+                    TYPE_DAILY -> binding.rbDaily.isChecked = true
+                    TYPE_WEEKLY -> binding.rbWeekly.isChecked = true
+                }
             }
         }
     }
 
     private fun initControls() {
         binding.includeToolbar.toolbar.setNavigationIcon(R.drawable.ic_back)
-        setToolbarTitle(binding.includeToolbar.toolbar,getString(R.string.toolbar_title_create_todo))
+        val toolbarTitle = if (updateItemId == null) getString(R.string.toolbar_title_create_todo)
+        else getString(R.string.toolbar_title_update_todo)
+        setToolbarTitle(
+            binding.includeToolbar.toolbar,
+            toolbarTitle
+        )
         subscribeUI()
         binding.etTime.setOnClickListener(this)
         binding.etDate.setOnClickListener(this)
@@ -67,16 +78,22 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
 
     private fun subscribeUI() {
         viewModel.liveDataInsert.observe(this, Observer {
-            when(it) {
-                is Resource.Loading -> {}
+            when (it) {
+                is Resource.Loading -> {
+                }
                 is Resource.Success -> {
                     val resultIntent = Intent()
-                    resultIntent.putExtra(Constants.KEY_DATA,it.data)
-                    setResult(Activity.RESULT_OK,resultIntent)
+                    resultIntent.putExtra(Constants.KEY_DATA, it.data)
+                    setResult(Activity.RESULT_OK, resultIntent)
                     finish()
                 }
                 is Resource.Error -> {
-                    SnackBarHelper.infoSnackBar(binding.root,getString(R.string.error_in_adding_todo),null,null)
+                    SnackBarHelper.infoSnackBar(
+                        binding.root,
+                        getString(R.string.error_in_adding_todo),
+                        null,
+                        null
+                    )
                 }
             }
         })
@@ -91,10 +108,10 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
     private fun createTodo() {
         val title = getTodoTitle()
         val description = getTodoDescription()
-        val type =  when(getTodoType()) {
-            R.id.rb_daily-> TYPE_DAILY
-            R.id.rb_weekly-> TYPE_WEEKLY
-            else-> TYPE_UNKNOWN
+        val type = when (getTodoType()) {
+            R.id.rb_daily -> TYPE_DAILY
+            R.id.rb_weekly -> TYPE_WEEKLY
+            else -> TYPE_UNKNOWN
         }
 
         binding.tilTitle.error = null
@@ -102,13 +119,14 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
         binding.tilTime.error = null
         binding.tilDate.error = null
 
-        if (title.isEmpty()) {
+        if (TodoModel.invalidTitle(title)) {
             binding.tilTitle.error = getString(R.string.error_enter_title)
             binding.etTitle.requestFocus()
-        } else if (selectedTime.isNullOrEmpty()) {
+        } else if (TodoModel.invalidTime(selectedTime)) {
             binding.tilTime.error = getString(R.string.error_select_time)
-            binding.etTime.requestFocus()
-        } else if (type == TYPE_UNKNOWN) {
+        } else if(TodoModel.invalidDate(selectedDate)) {
+            binding.tilDate.error = getString(R.string.error_select_date)
+        } else if (TodoModel.invalidType(type)) {
             SnackBarHelper.infoSnackBar(
                 binding.root,
                 getString(R.string.error_select_type),
@@ -117,11 +135,15 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
             )
         } else {
             hideKeyboard()
-            val data = TodoModel(null,title, description, selectedTime!!, selectedDate, type)
-            viewModel.insertTodo(data)
+            val data =
+                TodoModel(updateItemId, title, description, selectedTime!!, selectedDate, type)
+            updateItemId?.let {
+                viewModel.updateTodo(data)
+            } ?: kotlin.run {
+                viewModel.insertTodo(data)
+            }
         }
     }
-
 
     override fun onClick(view: View?) {
         when (view?.id) {
@@ -134,7 +156,7 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.et_date -> {
                 hideKeyboard()
-              openDatePicker()
+                openDatePicker()
             }
         }
     }
@@ -147,7 +169,7 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
                 .setMinute(10)
                 .setTitleText(getString(R.string.title_select_time))
                 .build()
-        picker.show(supportFragmentManager,"timePicker")
+        picker.show(supportFragmentManager, "timePicker")
 
 
         picker.addOnPositiveButtonClickListener {
@@ -155,7 +177,7 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
             val minute = picker.minute
             Timber.d("hour ${hour}:${minute}")
             selectedTime = "${hour}:${minute}"
-            binding.etTime.setText(Utility.getFormattedTime(hour,minute))
+            binding.etTime.setText(Utility.getFormattedTime(hour, minute))
             // call back code
         }
         picker.addOnNegativeButtonClickListener {
@@ -175,7 +197,7 @@ class CreateTodoActivity : BaseActivity(), View.OnClickListener {
                 .setTitleText(getString(R.string.title_select_date))
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build()
-        picker.show(supportFragmentManager,"datePicker")
+        picker.show(supportFragmentManager, "datePicker")
 
 
         picker.addOnPositiveButtonClickListener {

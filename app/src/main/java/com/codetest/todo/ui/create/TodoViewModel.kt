@@ -10,6 +10,7 @@ import com.codetest.todo.app.BaseApplication
 import com.codetest.todo.network.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 private typealias LIST_RESULT = Resource<List<TodoModel>>
@@ -51,6 +52,26 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository,
             } catch (e: Exception) {
                 e.printStackTrace()
                 _mutableLiveDataInsert.postValue(Resource.Error(e.message ?: baseApp.getString(R.string.error_something_went_wrong) ))
+            }
+        }
+    }
+
+    fun updateTodo(data:TodoModel) {
+        viewModelScope.launch {
+            try {
+                repository.updateTodo(data)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun deleteTodo(data:TodoModel) {
+        viewModelScope.launch {
+            try {
+                repository.deleteTodo(data)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

@@ -1,10 +1,13 @@
 package com.codetest.todo.ui.login
 
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.codetest.todo.BuildConfig
 import com.codetest.todo.R
 import com.codetest.todo.databinding.ActivityLoginBinding
 import com.codetest.todo.network.Resource
@@ -31,6 +34,11 @@ class LoginActivity : AppCompatActivity() {
         binding.buttonLogin.setOnClickListener {
             doLogin()
         }
+        if(BuildConfig.DEBUG) { //for debug only
+            binding.etEmail.setText("eve.holt@reqres.in")
+            binding.etPassword.setText("123456")
+
+        }
         subscribeUI()
     }
 
@@ -42,16 +50,16 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.etPassword.text.toString()
         binding.tilEmail.error = null
         binding.tilPassword.error = null
-        if (email.isEmpty()) {
+        if (UserData.isEmailEmpty(email)) {
             binding.tilEmail.error = getString(R.string.error_empty_email)
             binding.etEmail.requestFocus()
         } else if (!UserData.isValidEmailPattern(email)) {
             binding.tilEmail.error = getString(R.string.error_invalid_email)
             binding.etEmail.requestFocus()
-        } else if (password.isEmpty()) {
+        } else if (UserData.isPasswordEmpty(password)) {
             binding.tilPassword.error = getString(R.string.error_empty_password)
             binding.etPassword.requestFocus()
-        } else if (!UserData.isValidPassword(password)) {
+        } else if (!UserData.isValidPasswordLength(password)) {
             binding.tilPassword.error = getString(R.string.error_invalid_password)
             binding.etPassword.requestFocus()
         } else {
@@ -76,6 +84,7 @@ class LoginActivity : AppCompatActivity() {
                             SecurePreference.storeUserData(userData)
                             loginSuccess()
                         } else {
+                            updateUIState(true)
                             api.error?.let { error ->
                                 val errorMessage = error.errorMessage
                                     ?: getString(R.string.error_something_went_wrong)
@@ -101,6 +110,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun updateUIState(state: Boolean) {
+        if (state)
+            binding.progressHorizontal.hide()
+        else
+            binding.progressHorizontal.show()
         binding.etEmail.isEnabled = state
         binding.etPassword.isEnabled = state
         binding.buttonLogin.isEnabled = state

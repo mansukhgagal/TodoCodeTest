@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include_toolbar"
-        app:startIconDrawable="@drawable/ic_email"
+        app:startIconDrawable="@drawable/ic_title"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -31,6 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:maxLines="4"
+            android:text="@string/dummy_title"
             android:textColor="@android:color/black" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -47,7 +49,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_title"
-        app:startIconDrawable="@drawable/ic_email"
+        app:startIconDrawable="@drawable/ic_description"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -56,7 +58,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
-            android:lines="4"
+            android:maxLines="10"
+            android:minLines="4"
+            android:text="@string/dummy_desc"
             android:gravity="start|top"
             android:textColor="@android:color/black" />
 
@@ -74,7 +78,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_description"
-        app:startIconDrawable="@drawable/ic_email"
+        app:startIconDrawable="@drawable/ic_time"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -105,7 +109,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_time"
-        app:startIconDrawable="@drawable/ic_email"
+        app:startIconDrawable="@drawable/ic_date"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -132,7 +136,7 @@
         android:text="@string/label_type"
         app:fontFamily="@font/font_bold"
         android:textSize="18sp"
-        android:textColor="@color/colorOnBackground"
+        android:textColor="@color/color_on_background"
         app:layout_constraintStart_toStartOf="@+id/guideline_start"
         app:layout_constraintTop_toBottomOf="@+id/til_date" />
 
@@ -149,7 +153,7 @@
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/rb_daily"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/radio_height_type"
             android:background="@drawable/selector_type_start"
             android:button="@null"
             android:checked="false"
@@ -158,21 +162,21 @@
             android:text="@string/type_daily"
             android:minEms="6"
             android:textColor="@color/selector_type_text"
-            android:textSize="14sp" />
+            android:textSize="@dimen/text_size_radio_type" />
 
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/rb_weekly"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/radio_height_type"
             android:background="@drawable/selector_type_end"
             android:button="@null"
             android:gravity="center"
-            android:checked="true"
+            android:checked="false"
             android:minEms="6"
             android:fontFamily="@font/roboto_slab_medium"
             android:text="@string/type_weekly"
             android:textColor="@color/selector_type_text"
-            android:textSize="14sp" />
+            android:textSize="@dimen/text_size_radio_type" />
 
     </RadioGroup>
 

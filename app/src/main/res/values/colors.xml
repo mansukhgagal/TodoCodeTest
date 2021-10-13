@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="color_primary">@color/purple_500</color>
-    <color name="color_primary_variant">@color/purple_700</color>
-    <color name="color_on_primary">@color/colorWhite</color>
+    <color name="color_primary">#607D8B</color>
+    <color name="color_primary_variant">#455A64</color>
+    <color name="color_on_primary">@color/color_white</color>
+    <color name="color_accent">#9E9E9E</color>
 
-    <color name="color_secondary">@color/teal_200</color>
-    <color name="color_secondary_variant">@color/teal_700</color>
-    <color name="color_on_secondary">@color/colorBlack</color>
+    <color name="color_secondary">#757575</color>
+    <color name="color_secondary_variant">#FF018786</color>
+    <color name="color_on_secondary">@color/color_black</color>
 
-    <color name="colorOnBackground">#000000</color>
-    <color name="colorControlNormal">#ffffff</color>
-    <color name="colorToolbarTitle">#ffffff</color>
+    <color name="color_on_background">#000000</color>
+    <color name="color_control_normal">#ffffff</color>
+    <color name="color_toolbar_title">#ffffff</color>
 
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="colorBlack">#000000</color>
-    <color name="colorWhite">#FFFFFFFF</color>
+    <color name="color_black">#000000</color>
+    <color name="color_white">#FFFFFFFF</color>
+
+    <color name="color_list_card">#455A64</color>
 </resources>

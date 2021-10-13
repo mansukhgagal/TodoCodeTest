@@ -22,6 +22,7 @@ buildscript {
         verctor_version = '1.1.0'
         work_manager_version = '2.5.0'
         //test
+        testing_truth_version = '1.1.3'
         junit_version = '4.+'
         junit_ext_version = '1.1.3'
         espresso_version = '3.4.0'

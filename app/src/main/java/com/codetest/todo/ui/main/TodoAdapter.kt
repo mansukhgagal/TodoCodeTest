@@ -25,7 +25,7 @@ class TodoAdapter(val context: Context,val todoList:MutableList<TodoModel>) : Re
 
                 textTodoTitle.text = data.title
 
-                textTime.text = data.time
+                textTime.text = Utility.getDisplayFormattedTime(data.time)
 
                 data.date?.let {
                     textDate.text = Utility.getFormattedDate(it)
@@ -36,38 +36,30 @@ class TodoAdapter(val context: Context,val todoList:MutableList<TodoModel>) : Re
 
                 textTodoDescription.text = data.description
 
+                textType.show()
+                when(data.type) {
+                    Constants.TYPE_DAILY->textType.setText(context.getString(R.string.type_daily))
+                    Constants.TYPE_WEEKLY->textType.setText(context.getString(R.string.type_weekly))
+                    else -> textType.invisible()
+                }
+
                 card.setOnClickListener(this@TodoViewHolder)
                 ibMore.setOnClickListener(this@TodoViewHolder)
             }
         }
 
         override fun onClick(view: View?) {
+            val data = getItem(adapterPosition)
             when(view?.id) {
                 R.id.card->{
-                    val data = getItem(adapterPosition)
                     val detailIntent = Intent(context, CreateTodoActivity::class.java)
                     detailIntent.putExtra(Constants.KEY_DATA, data)
                     context.startActivity(detailIntent)
                 }
                 R.id.ib_more->{
-                    alertDelete()
+                    (context as? MainActivity)?.alertDelete(data)
                 }
             }
-        }
-
-        private fun alertDelete() {
-            val alertBuilder = MaterialAlertDialogBuilder(context)
-                .setPositiveButton(context.getString(R.string.button_yes)) { dialog, _ ->
-                    todoList.removeAt(adapterPosition)
-                    notifyItemRemoved(adapterPosition)
-                    dialog.dismiss()
-                }
-                .setNegativeButton(context.getString(R.string.button_no)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setMessage(context.getString(R.string.alert_message_delete_todo))
-            alertBuilder.create().show()
-
         }
     }
 
